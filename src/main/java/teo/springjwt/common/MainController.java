@@ -1,14 +1,14 @@
-package teo.springjwt.controller;
+package teo.springjwt.common;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class AdminController {
+public class MainController {
 
-  @GetMapping("/admin")
-  public String adminP() {
+  @GetMapping("/")
+  public String mainP() {
 
-    return "admin Controller";
+    return "main Controller";
   }
 }

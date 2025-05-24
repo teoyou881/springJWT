@@ -1,4 +1,4 @@
-package teo.springjwt.config;
+package teo.springjwt.common.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
