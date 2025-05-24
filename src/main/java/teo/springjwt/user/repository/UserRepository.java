@@ -5,4 +5,5 @@ import teo.springjwt.user.UserEntity;
 
 public interface UserRepository extends JpaRepository<UserEntity, Integer>, UserRepositoryCustom {
 
+  Boolean existsByUsername(String username);
 }

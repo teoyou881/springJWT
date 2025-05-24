@@ -2,6 +2,7 @@ package teo.springjwt.common.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -54,6 +55,7 @@ Spring Security의 기본 인증과 JWT를 혼용하는 경우: 만약 애플리
     // 경로별 인가 작업
     http.authorizeHttpRequests((auth) -> auth
         .requestMatchers("/login", "/", "/join").permitAll()
+        .requestMatchers(HttpMethod.POST, "/user").permitAll()
         .requestMatchers("/admin").hasRole("ADMIN")
         .anyRequest().authenticated());
 
