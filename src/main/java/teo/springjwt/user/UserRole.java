@@ -1,5 +1,8 @@
 package teo.springjwt.user;
 
+//spring security 관례에 맞게, enum 클래스 UserRole String 변경
 public enum UserRole {
-  USER, ADMIN
+  ROLE_USER,  // 사용자 역할
+  ROLE_ADMIN, // 관리자 역할
+  ROLE_GUEST  // 게스트 역할
 }
