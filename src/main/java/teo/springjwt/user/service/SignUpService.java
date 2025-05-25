@@ -25,7 +25,7 @@ public class SignUpService {
     UserEntity user = new UserEntity();
     user.setUsername(registerDTO.getUsername());
     user.setPassword(encoder.encode(registerDTO.getPassword()));
-    user.setRole(UserRole.USER);
+    user.setRole(UserRole.ROLE_USER);
     userRepository.save(user);
   }
 }

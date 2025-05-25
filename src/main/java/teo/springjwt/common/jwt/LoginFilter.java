@@ -29,23 +29,21 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     String password = obtainPassword(request);
 
     log.info("LoginFilter attemptAuthentication username: {}, password: {}", username, password);
-    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-        username,
-        password);
-
-
+    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(username, password);
     return authenticationManager.authenticate(authToken);
   }
 
-  //로그인 성공시 실행하는 메소드 (여기서 JWT를 발급하면 됨)
+  // 로그인 성공시 실행하는 메소드 (여기서 JWT를 발급하면 됨)
   @Override
-  protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) {
-
+  protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
+      Authentication authentication) {
+    log.info("LoginFilter successfulAuthentication");
   }
 
-  //로그인 실패시 실행하는 메소드
+  // 로그인 실패시 실행하는 메소드
   @Override
-  protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) {
-
+  protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
+      AuthenticationException failed) {
+    log.info("LoginFilter unsuccessfulAuthentication");
   }
 }
