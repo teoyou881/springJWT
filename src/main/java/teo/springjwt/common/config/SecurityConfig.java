@@ -1,5 +1,6 @@
 package teo.springjwt.common.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -11,17 +12,18 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import teo.springjwt.common.jwt.JWTUtil;
 import teo.springjwt.common.jwt.LoginFilter;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
-  //AuthenticationManager가 인자로 받을 AuthenticationConfiguraion 객체 생성자 주입
+  // AuthenticationManager가 인자로 받을 AuthenticationConfiguraion 객체 생성자 주입
   private final AuthenticationConfiguration authenticationConfiguration;
-  public SecurityConfig(AuthenticationConfiguration authenticationConfiguration) {
-    this.authenticationConfiguration = authenticationConfiguration;
-  }
+
+  private final JWTUtil jwtUtil;
 
   // 명시적으로 등록해야 한다.
   // security 5.0부터는 명시적으로 passwordEncoder를 빈으로 등록하지 않으면 예외 발생.
@@ -30,7 +32,7 @@ public class SecurityConfig {
     return new BCryptPasswordEncoder();
   }
 
-  //AuthenticationManager Bean 등록
+  // AuthenticationManager Bean 등록
   @Bean
   public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
 
@@ -74,10 +76,10 @@ Spring Security의 기본 인증과 JWT를 혼용하는 경우: 만약 애플리
     http.authorizeHttpRequests((auth) -> auth
         .requestMatchers("/login", "/", "/join").permitAll()
         .requestMatchers(HttpMethod.POST, "/user").permitAll()
-        .requestMatchers("/admin").hasRole("ADMIN")
-        .anyRequest().authenticated());
+        .requestMatchers("/admin").hasRole("ADMIN").anyRequest().authenticated());
 
-    http.addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration)), UsernamePasswordAuthenticationFilter.class);
+    http.addFilterAt(
+        new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil), UsernamePasswordAuthenticationFilter.class);
 
     // 세션 설정
     http.sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));

@@ -8,11 +8,14 @@ import io.jsonwebtoken.SignatureException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.Keys;
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 import java.util.Date;
 import javax.crypto.SecretKey;
+import lombok.Getter;
 import org.springframework.stereotype.Component;
 
 @Component
+@Getter
 public class JWTUtil {
 
   private final JWTProperties jwtProperties;
@@ -62,14 +65,14 @@ public class JWTUtil {
   }
 
   // JWT 생성
-  public String createJwt(String username, String role, Long expirationMs) {
+  public String createJwt(String username, Collection<String> roles, Long expirationMs) {
     long currentTime = System.currentTimeMillis();
     Date issuedAt = new Date(currentTime);
-    Date expiration = new Date(currentTime + expirationMs); // 외부에서 받은 만료 시간 사용
+    Date expiration = new Date(currentTime + expirationMs);
 
     return Jwts.builder()
                .claim("username", username)
-               .claim("role", role)
+               .claim("roles", roles) // 모든 권한을 'roles' 클레임으로 저장
                .issuedAt(issuedAt)
                .expiration(expiration)
                .signWith(secretKey)
