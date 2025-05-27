@@ -22,3 +22,12 @@ spring:
         dialect: org.hibernate.dialect.MySQL8Dialect # ? ?? ???? Dialect? ????? ??
         format_sql: true
     show-sql: true
+
+
+jwt:
+#  base64로 인코딩된 값
+  secret: c2RmYmFzZGtnamJzYWRuZndscXB6bWduYmVs
+  access-token-expiration-ms: 3600000 # 예: 1시간 (밀리초)
+  refresh-token-expiration-ms: 604800000 # 예: 7일 (밀리초)
+  token-prefix: Bearer
+  header-string: Authorization
