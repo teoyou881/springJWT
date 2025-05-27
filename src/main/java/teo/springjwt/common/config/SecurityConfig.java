@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -12,6 +14,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import teo.springjwt.common.jwt.JWTFilter;
 import teo.springjwt.common.jwt.JWTUtil;
 import teo.springjwt.common.jwt.LoginFilter;
 
@@ -38,6 +41,17 @@ public class SecurityConfig {
 
     return configuration.getAuthenticationManager();
   }
+
+  // ⭐ 1. RoleHierarchyImpl 빈 정의 ⭐
+  @Bean
+  public RoleHierarchy roleHierarchy() {
+    return RoleHierarchyImpl.fromHierarchy(
+        "ROLE_ADMIN > ROLE_MANAGER > ROLE_MANAGER > ROLE_USER");
+  }
+  // ⭐ 2. HttpSecurity에 RoleHierarchy 빈 등록 ⭐
+  // Spring Security 6 부터는 Expression Handler에 자동으로 등록됨
+  // (WebSecurityConfigurerAdapter 방식에서는 별도로 등록해야 했음)
+  // 현재 방식에서는 roleHierarchy 빈만 정의하면 자동으로 사용됩니다.
 
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -76,10 +90,12 @@ Spring Security의 기본 인증과 JWT를 혼용하는 경우: 만약 애플리
     http.authorizeHttpRequests((auth) -> auth
         .requestMatchers("/login", "/", "/join").permitAll()
         .requestMatchers(HttpMethod.POST, "/user").permitAll()
-        .requestMatchers("/admin").hasRole("ADMIN").anyRequest().authenticated());
-
-    http.addFilterAt(
-        new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil), UsernamePasswordAuthenticationFilter.class);
+        .requestMatchers("/admin/**").hasRole("ADMIN") // ADMIN만 접근 가능 (계층 덕분에 MANAGER, USER도 포함)
+        .requestMatchers("/manager/**").hasRole("MANAGER") // MANAGER 이상만 접근 가능 (계층 덕분에 ADMIN도 포함)
+        .requestMatchers("/user/**").hasRole("USER") // USER 이상만 접근 가능 (계층 덕분에 ADMIN, MANAGER도 포함)
+        .anyRequest().authenticated());// 나머지 요청은 인증만 되면 접근 가능
+    http.addFilterBefore(new JWTFilter(jwtUtil), LoginFilter.class);
+    http.addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil), UsernamePasswordAuthenticationFilter.class);
 
     // 세션 설정
     http.sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
