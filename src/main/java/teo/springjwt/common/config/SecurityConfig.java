@@ -48,7 +48,7 @@ public class SecurityConfig {
   @Bean
   public RoleHierarchy roleHierarchy() {
     return RoleHierarchyImpl.fromHierarchy(
-        "ROLE_ADMIN > ROLE_MANAGER > ROLE_MANAGER > ROLE_USER");
+        "ROLE_ADMIN > ROLE_MANAGER > ROLE_USER");
   }
   // ⭐ 2. HttpSecurity에 RoleHierarchy 빈 등록 ⭐
   // Spring Security 6 부터는 Expression Handler에 자동으로 등록됨
