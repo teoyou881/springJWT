@@ -2,13 +2,10 @@ package teo.springjwt.common.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.SignatureException;
-import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.Keys;
 import java.nio.charset.StandardCharsets;
-import java.util.Collection;
 import java.util.Date;
 import javax.crypto.SecretKey;
 import lombok.Getter;
@@ -42,6 +39,7 @@ public class JWTUtil {
   }
 
   // 토큰에서 역할을 추출
+  // UserRole 타입으로 가져올 수 없다. 반환값을 UserRole에서 String으로 변환
   public String getRole(String token) {
     try {
       return extractClaim(token).get("role", String.class);
@@ -65,14 +63,14 @@ public class JWTUtil {
   }
 
   // JWT 생성
-  public String createJwt(String username, Collection<String> roles, Long expirationMs) {
+  public String createJwt(String username, String role, Long expirationMs) {
     long currentTime = System.currentTimeMillis();
     Date issuedAt = new Date(currentTime);
     Date expiration = new Date(currentTime + expirationMs);
 
     return Jwts.builder()
                .claim("username", username)
-               .claim("roles", roles) // 모든 권한을 'roles' 클레임으로 저장
+               .claim("role", role)
                .issuedAt(issuedAt)
                .expiration(expiration)
                .signWith(secretKey)
@@ -92,14 +90,17 @@ public class JWTUtil {
   public boolean validateToken(String token) {
     try {
       Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token);
-      return true;
-    } catch (SignatureException | MalformedJwtException | UnsupportedJwtException | IllegalArgumentException e) {
-      // 잘못된 서명, 잘못된 JWT, 지원되지 않는 JWT, 잘못된 인자 등
-      System.err.println("Invalid JWT token: " + e.getMessage());
+      return true; // 토큰이 유효하면 true 반환
     } catch (ExpiredJwtException e) {
-      // 만료된 토큰
+      // 만료된 토큰: 특정 로직이 필요할 수 있으므로 별도 처리
+      // todo
+      // 만료된 경우? refresh Token 발급? 할까?
       System.err.println("Expired JWT token: " + e.getMessage());
+      return false; // 만료된 토큰은 유효하지 않으므로 false 반환
+    } catch (JwtException e) {
+      // 모든 다른 JWT 관련 예외 (서명 오류, 구조 오류, 지원되지 않는 형식, 잘못된 클레임 등)
+      System.err.println("Invalid JWT token: " + e.getMessage());
+      return false; // 유효하지 않은 토큰은 false 반환
     }
-    return false;
   }
 }
