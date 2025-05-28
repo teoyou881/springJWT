@@ -4,5 +4,6 @@ package teo.springjwt.user;
 public enum UserRole {
   ROLE_USER,  // 사용자 역할
   ROLE_ADMIN, // 관리자 역할
-  ROLE_GUEST  // 게스트 역할
+  ROLE_MANAGER,  // 매니저 역할
+  ROLE_GUEST
 }

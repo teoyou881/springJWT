@@ -15,12 +15,6 @@ public class UserController {
 
  private final  SignUpService signUpService;
 
-  @GetMapping("/admin")
-  public String adminP() {
-
-    return "admin Controller";
-  }
-
   @PostMapping("/user")
   public String signUp(RegisterDTO registerDTO) {
     signUpService.signUpProcess(registerDTO);
@@ -39,5 +33,15 @@ public class UserController {
   @GetMapping("/user/{id}")
   public String findUser(@PathVariable("id") UserEntity user) {
     return user.getUsername();
+  }
+
+  @GetMapping("/admin")
+  public String admin() {
+    return "admin Controller";
+  }
+
+  @GetMapping("/manager")
+  public String manager() {
+    return "manager Controller";
   }
 }

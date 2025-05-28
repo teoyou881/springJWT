@@ -4,6 +4,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Collection;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -49,11 +50,17 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     // 부여받은 role이 2개 이상일 수 있기 때문에,
     // Collection으로 반환.
+    // Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+    // Collection<String> roles = authorities.stream().map(GrantedAuthority::getAuthority).toList();
+
+    // 무조건 하나의 role만 가지고 있따고 가정.
+    // 그리고 RoleHirerachy 를 구현해서 2개 이상일 경우를 처리하자.
     Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
-    Collection<String> roles = authorities.stream().map(GrantedAuthority::getAuthority).toList();
+    Optional<String> optionalRole = authorities.stream().findFirst() // Optional<GrantedAuthority>를 반환
+                                    .map(GrantedAuthority::getAuthority);// Optional<String>으로 변환
+    String role = optionalRole.orElseGet(() -> "");
 
-
-    String token = jwtUtil.createJwt(username, roles, 60*60*10L);
+    String token = jwtUtil.createJwt(username, role, 60*60*1000L);
 
     response.addHeader(jwtUtil.getJwtProperties().getHeaderString(), jwtUtil.getJwtProperties().getTokenPrefix() + " " + token);
     response.setStatus(HttpServletResponse.SC_OK); // 200 OK
