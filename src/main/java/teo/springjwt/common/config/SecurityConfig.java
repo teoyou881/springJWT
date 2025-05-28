@@ -1,5 +1,6 @@
 package teo.springjwt.common.config;
 
+import java.util.Collections;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +15,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
 import teo.springjwt.common.jwt.JWTFilter;
 import teo.springjwt.common.jwt.JWTUtil;
 import teo.springjwt.common.jwt.LoginFilter;
@@ -85,6 +87,19 @@ Spring Security의 기본 인증과 JWT를 혼용하는 경우: 만약 애플리
     http.formLogin((auth) -> auth.disable());
     // http basic 인증 방식 disable
     http.httpBasic((auth) -> auth.disable());
+
+    // todo
+    // after test, should edit origin
+    http.cors(cors->cors
+        .configurationSource((httpServletRequest)->{
+          CorsConfiguration corsConfiguration = new CorsConfiguration();
+          corsConfiguration.addAllowedOrigin("*");
+          corsConfiguration.addAllowedHeader("*");
+          corsConfiguration.addAllowedMethod("*");
+          corsConfiguration.setAllowCredentials(true);
+          corsConfiguration.setExposedHeaders(Collections.singletonList("Authorization"));
+          return corsConfiguration;
+        }));
 
     // 경로별 인가 작업
     http.authorizeHttpRequests((auth) -> auth
