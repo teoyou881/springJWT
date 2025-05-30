@@ -70,7 +70,7 @@ public class JWTFilter extends OncePerRequestFilter {
     // --- JWT 유효성 검증 로직 끝 ---
 
     //토큰에서 username과 role 획득
-    String username = jwtUtil.getUsername(token);
+    String email = jwtUtil.getEmail(token);
 
     // jwt에서 enum으로 바로 변환 못함. 그래서 null 에러가 발생.
     /*
@@ -79,11 +79,7 @@ public class JWTFilter extends OncePerRequestFilter {
     String roleString =jwtUtil.getRole(token);
 
     //userEntity를 생성하여 값 set
-    UserEntity userEntity = new UserEntity();
-    userEntity.setUsername(username);
-    // 비밀번호를 null 로 설정해둔다.
-    userEntity.setPassword(null);
-    userEntity.setRole(UserRole.valueOf(roleString));
+    UserEntity userEntity = new UserEntity(email, null, UserRole.valueOf(roleString));
 
     //UserDetails에 회원 정보 객체 담기
     CustomUserDetails customUserDetails = new CustomUserDetails(userEntity);

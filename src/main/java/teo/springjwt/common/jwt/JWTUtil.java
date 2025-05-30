@@ -27,9 +27,9 @@ public class JWTUtil {
   }
 
   // 토큰에서 사용자 이름을 추출
-  public String getUsername(String token) {
+  public String getEmail(String token) {
     try {
-      return extractClaim(token).get("username", String.class);
+      return extractClaim(token).get("email", String.class);
     } catch (Exception e) {
       // JWT 관련 예외 처리: 예를 들어, 로그를 남기고 null 또는 특정 예외를 다시 던질 수 있음
       System.err.println("Error extracting username from token: " + e.getMessage());
