@@ -30,11 +30,11 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
       throws AuthenticationException {
 
     // username, password 획득
-    String username = obtainUsername(request);
+    String email = request.getParameter("email");
     String password = obtainPassword(request);
 
-    log.info("LoginFilter attemptAuthentication username: {}, password: {}", username, password);
-    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(username, password);
+    log.info("LoginFilter attemptAuthentication email: {}, password: {}", email, password);
+    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(email, password);
     return authenticationManager.authenticate(authToken);
   }
 
@@ -46,7 +46,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     //UserDetailsS
     CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
 
-    String username = customUserDetails.getUsername();
+    String email = customUserDetails.getEmail();
 
     // 부여받은 role이 2개 이상일 수 있기 때문에,
     // Collection으로 반환.
@@ -60,7 +60,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
                                     .map(GrantedAuthority::getAuthority);// Optional<String>으로 변환
     String role = optionalRole.orElseGet(() -> "");
 
-    String token = jwtUtil.createJwt(username, role, 60*60*1000L);
+    String token = jwtUtil.createJwt(email, role, 60*60*1000L);
 
     response.addHeader(jwtUtil.getJwtProperties().getHeaderString(), jwtUtil.getJwtProperties().getTokenPrefix() + " " + token);
     response.setStatus(HttpServletResponse.SC_OK); // 200 OK

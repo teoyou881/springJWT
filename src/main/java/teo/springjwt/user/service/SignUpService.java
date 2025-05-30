@@ -16,16 +16,13 @@ public class SignUpService {
   private final BCryptPasswordEncoder encoder;
 
   public void signUpProcess(RegisterDTO registerDTO) {
-    Boolean isExist = userRepository.existsByUsername(registerDTO.getUsername());
+    Boolean isExist = userRepository.existsByEmail(registerDTO.getEmail());
 
     if (isExist) {
       return;
     }
 
-    UserEntity user = new UserEntity();
-    user.setUsername(registerDTO.getUsername());
-    user.setPassword(encoder.encode(registerDTO.getPassword()));
-    user.setRole(UserRole.ROLE_USER);
+    UserEntity user = new UserEntity(registerDTO.getEmail(),encoder.encode(registerDTO.getPassword()),UserRole.ROLE_USER);
     userRepository.save(user);
   }
 }
