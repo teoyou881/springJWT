@@ -11,9 +11,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
-import teo.springjwt.user.UserEntity;
-import teo.springjwt.user.UserRole;
 import teo.springjwt.user.dto.CustomUserDetails;
+import teo.springjwt.user.entity.UserEntity;
+import teo.springjwt.user.enumerated.UserRole;
 
 public class JWTFilter extends OncePerRequestFilter {
 
@@ -74,7 +74,7 @@ public class JWTFilter extends OncePerRequestFilter {
 
     // jwt에서 enum으로 바로 변환 못함. 그래서 null 에러가 발생.
     /*
-    Error extracting role from token: Cannot convert existing claim value of type 'class java.lang.String' to desired type 'class teo.springjwt.user.UserRole'. JJWT only converts simple String, Date, Long, Integer, Short and Byte types automatically. Anything more complex is expected to be already converted to your desired type by the JSON Deserializer implementation. You may specify a custom Deserializer for a JwtParser with the desired conversion configuration via the JwtParserBuilder.deserializer() method. See https://github.com/jwtk/jjwt#custom-json-processor for more information. If using Jackson, you can specify custom claim POJO types as described in https://github.com/jwtk/jjwt#json-jackson-custom-types
+    Error extracting role from token: Cannot convert existing claim value of type 'class java.lang.String' to desired type 'class teo.springjwt.user.enumerated.UserRole'. JJWT only converts simple String, Date, Long, Integer, Short and Byte types automatically. Anything more complex is expected to be already converted to your desired type by the JSON Deserializer implementation. You may specify a custom Deserializer for a JwtParser with the desired conversion configuration via the JwtParserBuilder.deserializer() method. See https://github.com/jwtk/jjwt#custom-json-processor for more information. If using Jackson, you can specify custom claim POJO types as described in https://github.com/jwtk/jjwt#json-jackson-custom-types
     * */
     String roleString =jwtUtil.getRole(token);
 

@@ -4,8 +4,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import teo.springjwt.user.UserEntity;
 import teo.springjwt.user.dto.CustomUserDetails;
+import teo.springjwt.user.entity.UserEntity;
 import teo.springjwt.user.repository.UserRepository;
 
 @Service

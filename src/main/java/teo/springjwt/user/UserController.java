@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import teo.springjwt.user.dto.RegisterDTO;
+import teo.springjwt.user.entity.UserEntity;
 import teo.springjwt.user.service.SignUpService;
 
 @RestController
@@ -31,7 +32,8 @@ public class UserController {
   // 따라서, 영속성 컨텍스트에서 관리되지 않는 상태. detached.
   // dirty checking 되지 않는다.
   @GetMapping("/user/{id}")
-  public String findUser(@PathVariable("id") UserEntity user) {
+  public String findUser(@PathVariable("id")
+  UserEntity user) {
     return user.getUsername();
   }
 

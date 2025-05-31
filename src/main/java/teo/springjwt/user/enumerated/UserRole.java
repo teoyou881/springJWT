@@ -1,4 +1,4 @@
-package teo.springjwt.user;
+package teo.springjwt.user.enumerated;
 
 //spring security 관례에 맞게, enum 클래스 UserRole String 변경
 public enum UserRole {

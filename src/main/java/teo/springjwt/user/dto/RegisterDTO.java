@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
-import teo.springjwt.user.UserRole;
+import teo.springjwt.user.enumerated.UserRole;
 
 @Data
 public class RegisterDTO {

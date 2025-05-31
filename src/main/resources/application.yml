@@ -10,16 +10,18 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
+
+
       naming:
 #        ?? ??? SpringPhysicalNamingStrategy --> camelcase? sneak-case? ???.
 
 #        ?? ??? --> hibernate? ?? ??? ?? ?? ??
 #        ??? ?? User => ??? User  /   ?? ?? userName => ?? userName
-        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+        physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQL8Dialect # ? ?? ???? Dialect? ????? ??
+#        dialect: org.hibernate.dialect.MySQLDialect # ? ?? ???? Dialect? ????? ??
         format_sql: true
     show-sql: true
 

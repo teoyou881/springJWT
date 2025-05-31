@@ -1,4 +1,4 @@
-package teo.springjwt.user;
+package teo.springjwt.user.entity;
 
 import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.EnumType.STRING;
@@ -19,11 +19,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import teo.springjwt.cart.CartEntity;
-import teo.springjwt.common.entity.AddressEntity;
 import teo.springjwt.common.entity.BaseTimeEntity;
-import teo.springjwt.common.entity.PaymentEntity;
 import teo.springjwt.order.OrderEntity;
 import teo.springjwt.review.ReviewEntity;
+import teo.springjwt.user.enumerated.UserRole;
 import teo.springjwt.wishlist.WishlistEntity;
 
 @Entity
@@ -36,9 +35,12 @@ public class UserEntity extends BaseTimeEntity {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "user_id") // 명시적으로 컬럼명 지정
   private Long id;
+
   @Column(name = "email", unique = true, nullable = false, length = 100)
   private String email;
+
   // 일단 옵션으로
+  @Column(name = "username", length = 100)
   private String username;
   @Column(name = "password", nullable = false, length = 255) // 비밀번호 컬럼, 필수 (암호화된 비밀번호 저장)
   private String password;
@@ -64,12 +66,12 @@ public class UserEntity extends BaseTimeEntity {
 
   // 1:N 매핑: 한 사용자는 여러 결제 수단을 가질 수 있음
   @OneToMany(mappedBy = "user", cascade = ALL, orphanRemoval = true)
-  private List<PaymentEntity> paymentMethods = new ArrayList<>();
+  private List<PaymentMethodEntity> paymentMethods = new ArrayList<>();
 
-  @OneToMany(mappedBy = "user", fetch = LAZY)
+  @OneToMany(mappedBy = "user", cascade = ALL, orphanRemoval = true, fetch = LAZY) // Add cascade for order management if desired
   private List<OrderEntity> orders = new ArrayList<>();
 
-  @OneToMany(mappedBy = "user", fetch = LAZY)
+  @OneToMany(mappedBy = "user", cascade = ALL, orphanRemoval = true, fetch = LAZY) // Add cascade for review management if desired
   private List<ReviewEntity> reviews = new ArrayList<>();
 
   public UserEntity(String email, String password, UserRole role) {
@@ -81,9 +83,7 @@ public class UserEntity extends BaseTimeEntity {
   // --- 비즈니스 로직 메서드 (Setter 대신) ---
 
   public void updateUsername(String newUsername) {
-    if (newUsername != null && !newUsername.trim().isEmpty()) {
-      this.username = newUsername;
-    }
+    this.username = newUsername; // Nullable
   }
 
   public void updatePhoneNumber(String newPhoneNumber) {
@@ -96,33 +96,71 @@ public class UserEntity extends BaseTimeEntity {
     }
     this.password = newPassword; // 실제 앱에서는 새 비밀번호도 해싱 필요
   }
+  public void changeRole(UserRole newRole) {
+    if (newRole == null) throw new IllegalArgumentException("New role cannot be null.");
+    this.role = newRole;
+  }
 
   // 연관관계 편의 메서드 (양방향 매핑 시 컬렉션 추가/삭제 로직)
+  // Association convenience methods are well implemented
   public void addAddress(AddressEntity address) {
-    this.addresses.add(address);
-    address.setUser(this); // AddressEntity에도 UserEntity 설정 (연관관계 주인)
+    if (address != null && !this.addresses.contains(address)) {
+      this.addresses.add(address);
+      address.setUser(this);
+    }
   }
 
   public void removeAddress(AddressEntity address) {
-    this.addresses.remove(address);
-    address.setUser(null); // AddressEntity에서 UserEntity 연결 해제
+    if (address != null && this.addresses.remove(address)) {
+      address.setUser(null);
+    }
   }
 
-  public void addPaymentMethod(PaymentEntity payment) {
-    this.paymentMethods.add(payment);
-    payment.setUser(this);
+  public void addPaymentMethod(CardEntity payment) { // Use CardEntity or PaymentMethodEntity
+    if (payment != null && !this.paymentMethods.contains(payment)) {
+      this.paymentMethods.add(payment);
+      payment.setUser(this);
+    }
   }
 
-  public void removePaymentMethod(PaymentEntity payment) {
-    this.paymentMethods.remove(payment);
-    payment.setUser(null);
+  public void removePaymentMethod(CardEntity payment) { // Use CardEntity or PaymentMethodEntity
+    if (payment != null && this.paymentMethods.remove(payment)) {
+      payment.setUser(null);
+    }
+  }
+
+  public void setCart(CartEntity cart) {
+    if (cart == null) {
+      if (this.cart != null) {
+        this.cart.setUser(null); // Break old link
+      }
+      this.cart = null;
+    } else {
+      if (this.cart != null && this.cart != cart) { // If changing cart, break old link
+        this.cart.setUser(null);
+      }
+      this.cart = cart;
+      if (cart.getUser() != this) { // Ensure bidirectional link
+        cart.setUser(this);
+      }
+    }
   }
 
   public void setWishlist(WishlistEntity wishlist) {
-    this.wishlist = wishlist;
-    wishlist.setUser(this); // WishlistEntity에도 UserEntity 설정
+    if (wishlist == null) {
+      if (this.wishlist != null) {
+        this.wishlist.setUser(null);
+      }
+      this.wishlist = null;
+    } else {
+      if (this.wishlist != null && this.wishlist != wishlist) {
+        this.wishlist.setUser(null);
+      }
+      this.wishlist = wishlist;
+      if (wishlist.getUser() != this) {
+        wishlist.setUser(this);
+      }
+    }
   }
-
-
 }
 
