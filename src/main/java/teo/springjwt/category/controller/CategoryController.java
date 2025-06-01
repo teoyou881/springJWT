@@ -20,8 +20,7 @@ public class CategoryController {
   private final CategoryService categoryService;
 
   @PostMapping
-  public ResponseEntity<String> createCategory(@Valid CategoryCreateDTO requestDto) {
-    // 서비스 계층으로 DTO 전달
+  public ResponseEntity<String> createCategory(@Valid @RequestBody CategoryCreateDTO requestDto) {
     categoryService.createCategory(requestDto);
     return ResponseEntity.ok("Category created successfully");
   }
