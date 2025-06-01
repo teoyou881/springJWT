@@ -1,10 +1,8 @@
 package teo.springjwt.common.config;
 
-import java.util.Collections;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,7 +13,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
 import teo.springjwt.common.jwt.JWTFilter;
 import teo.springjwt.common.jwt.JWTUtil;
 import teo.springjwt.common.jwt.LoginFilter;
@@ -88,27 +85,31 @@ Spring Security의 기본 인증과 JWT를 혼용하는 경우: 만약 애플리
     // http basic 인증 방식 disable
     http.httpBasic((auth) -> auth.disable());
 
-    // todo
+    /*
+    * cors 세팅은 webconfig에서!
+    * */
     // after test, should edit origin
-    http.cors(cors->cors
-        .configurationSource((httpServletRequest)->{
-          CorsConfiguration corsConfiguration = new CorsConfiguration();
-          corsConfiguration.addAllowedOrigin("*");
-          corsConfiguration.addAllowedHeader("*");
-          corsConfiguration.addAllowedMethod("*");
-          corsConfiguration.setAllowCredentials(true);
-          corsConfiguration.setExposedHeaders(Collections.singletonList("Authorization"));
-          return corsConfiguration;
-        }));
+    // http.cors(cors->cors
+    //     .configurationSource((httpServletRequest)->{
+    //       CorsConfiguration corsConfiguration = new CorsConfiguration();
+    //       corsConfiguration.addAllowedOrigin("*");
+    //       corsConfiguration.addAllowedHeader("*");
+    //       corsConfiguration.addAllowedMethod("*");
+    //       corsConfiguration.setAllowCredentials(true);
+    //       corsConfiguration.setExposedHeaders(Collections.singletonList("Authorization"));
+    //       return corsConfiguration;
+    //     }));
 
     // 경로별 인가 작업
+    //todo
+    //어드민 페이지 먼저 작성하고 그 다음 security
     http.authorizeHttpRequests((auth) -> auth
-        .requestMatchers("/login", "/", "/join").permitAll()
-        .requestMatchers(HttpMethod.POST, "/user").permitAll()
-        .requestMatchers("/admin/**").hasRole("ADMIN") // ADMIN만 접근 가능 (계층 덕분에 MANAGER, USER도 포함)
-        .requestMatchers("/manager/**").hasRole("MANAGER") // MANAGER 이상만 접근 가능 (계층 덕분에 ADMIN도 포함)
-        .requestMatchers("/user/**").hasRole("USER") // USER 이상만 접근 가능 (계층 덕분에 ADMIN, MANAGER도 포함)
-        .anyRequest().authenticated());// 나머지 요청은 인증만 되면 접근 가능
+        // .requestMatchers("/login", "/", "/join").permitAll()
+        // .requestMatchers(HttpMethod.POST, "/user").permitAll()
+        // .requestMatchers("/admin/**").hasRole("ADMIN") // ADMIN만 접근 가능 (계층 덕분에 MANAGER, USER도 포함)
+        // .requestMatchers("/manager/**").hasRole("MANAGER") // MANAGER 이상만 접근 가능 (계층 덕분에 ADMIN도 포함)
+        // .requestMatchers("/user/**").hasRole("USER") // USER 이상만 접근 가능 (계층 덕분에 ADMIN, MANAGER도 포함)
+        .anyRequest().permitAll());// 나머지 요청은 인증만 되면 접근 가능
     http.addFilterBefore(new JWTFilter(jwtUtil), LoginFilter.class);
     http.addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil), UsernamePasswordAuthenticationFilter.class);
 
