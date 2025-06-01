@@ -68,7 +68,8 @@ public class CategoryService {
     //    이때 fromEntityFlat 메서드가 childCategories를 빈 리스트로 설정합니다.
     return uniqueCategories.stream()
                            .map(CategoryResponseDTO::fromEntityFlat) // 평면 DTO 팩토리 메서드 호출
-                           .sorted(Comparator.comparing(CategoryResponseDTO::getId)) // 예시: ID 순으로 정렬
+                           .sorted(Comparator.comparing(CategoryResponseDTO::getParentId, Comparator.nullsFirst(Comparator.naturalOrder()))
+                                       .thenComparing(CategoryResponseDTO::getId)) // 예시: ID 순으로 정렬
                            .toList(); // Java 16+ .toList()
   }
 
@@ -104,6 +105,20 @@ public class CategoryService {
     System.out.println("newCategory = " + newCategory);
 
     return categoryRepository.save(newCategory);
+  }
+
+  public CategoryEntity updateCategory(CategoryEntity category) {
+    return null;
+  }
+
+  public CategoryEntity deleteCategory(Long id) {
+    CategoryEntity category = categoryRepository.findById(id)
+                                             .orElseThrow(() -> new IllegalArgumentException("Category not found with ID: " + id));
+    if (category.getParentCategory() != null) {
+      category.getParentCategory().removeChildCategory(category);
+    }
+    categoryRepository.delete(category);
+    return category;
   }
 
 

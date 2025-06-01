@@ -4,10 +4,14 @@ import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import teo.springjwt.category.CategoryEntity;
 import teo.springjwt.category.dao.CategoryCreateDTO;
 import teo.springjwt.category.dao.CategoryResponseDTO;
 import teo.springjwt.category.service.CategoryService;
@@ -35,6 +39,12 @@ public class CategoryController {
   public ResponseEntity<List<CategoryResponseDTO>> getTreeAllCategories() {
     List<CategoryResponseDTO> allCategories = categoryService.getHierarchicalCategories();
     return ResponseEntity.ok(allCategories);
+  }
+
+  @DeleteMapping("/{id}")
+  public ResponseEntity<CategoryEntity> deleteCategory(@PathVariable Long id) {
+    CategoryEntity categoryEntity = categoryService.deleteCategory(id);
+    return ResponseEntity.ok(categoryEntity);
   }
 
 
