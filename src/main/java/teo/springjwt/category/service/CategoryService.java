@@ -88,10 +88,20 @@ public class CategoryService {
                                          .orElseThrow(() -> new IllegalArgumentException("Parent category not found with ID: " + request.getParentId()));
     }
 
+    Integer maxDisplayOrder = categoryRepository.findMaxDisplayOrderByParentId(request.getParentId()).orElseGet(() -> 0);
+
     // CategoryEntity 생성자 사용 (CategoryEntity 코드에 생성자가 정의되어 있어야 함)
     // 1. 최상위 카테고리 생성 (parentCategory가 null)
     // 2. 자식 카테고리 생성 (parentCategory가 존재)
-    CategoryEntity newCategory = new CategoryEntity(request.getName(),request.getDisplayOrder(), parentCategory);
+    CategoryEntity newCategory;
+    if(parentCategory == null) {
+      newCategory = new CategoryEntity(request.getName(),maxDisplayOrder+1);
+    }else {
+      newCategory= new CategoryEntity(request.getName(),maxDisplayOrder+1, parentCategory);
+    }
+
+
+    System.out.println("newCategory = " + newCategory);
 
     return categoryRepository.save(newCategory);
   }
