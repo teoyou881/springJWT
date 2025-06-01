@@ -14,6 +14,8 @@ import jakarta.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import teo.springjwt.common.entity.BaseTimeEntity;
@@ -21,6 +23,8 @@ import teo.springjwt.common.entity.BaseTimeEntity;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class CategoryEntity extends BaseTimeEntity { // 생성, 수정 시간 관리를 위해 상속
 
     @Id
@@ -30,6 +34,9 @@ public class CategoryEntity extends BaseTimeEntity { // 생성, 수정 시간 �
 
     @Column(name = "name", nullable = false, unique = true)
     private String name; // 카테고리 이름 (예: "의류", "상의", "하의")
+
+    @Column(nullable = false)
+    private int displayOrder; // 같은 부모를 가진 형제 카테고리 내에서의 정렬 순서
 
     // --- 계층형 구조를 위한 Self-Referencing 매핑 ---
 
@@ -48,18 +55,35 @@ public class CategoryEntity extends BaseTimeEntity { // 생성, 수정 시간 �
     @OneToMany(mappedBy = "parentCategory", cascade = ALL, orphanRemoval = true, fetch = LAZY)
     private List<CategoryEntity> childCategories = new ArrayList<>();
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CategoryEntity that = (CategoryEntity) o;
+        return id != null && id.equals(that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id != null ? id.hashCode() : 0;
+    }
+
     // --- 생성자 ---
     // 최상위 카테고리 생성자 (부모 없음)
-    public CategoryEntity(String name) {
-        if (name == null || name.trim().isEmpty()) {
+    public CategoryEntity(String name, int displayOrder) {
+        if (name == null || name.trim().isEmpty()){
             throw new IllegalArgumentException("카테고리 이름은 필수입니다.");
         }
+        if(displayOrder < 0 || displayOrder > 999999999) {
+            throw new IllegalArgumentException("정렬 순서는 필수입니다.");
+        }
         this.name = name;
+        this.displayOrder = displayOrder;
     }
 
     // 자식 카테고리 생성자 (부모 지정)
-    public CategoryEntity(String name, CategoryEntity parentCategory) {
-        this(name); // 기존 생성자 호출
+    public CategoryEntity(String name, int displayOrder, CategoryEntity parentCategory) {
+        this(name,displayOrder); // 기존 생성자 호출
         if (parentCategory == null) {
             throw new IllegalArgumentException("부모 카테고리는 null이 될 수 없습니다. 최상위 카테고리 생성자를 사용하세요.");
         }
