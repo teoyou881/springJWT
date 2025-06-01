@@ -107,6 +107,7 @@ public class CategoryService {
     return categoryRepository.save(newCategory);
   }
 
+  //todo
   public CategoryEntity updateCategory(CategoryEntity category) {
     return null;
   }
