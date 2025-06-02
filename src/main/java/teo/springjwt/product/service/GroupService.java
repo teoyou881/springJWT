@@ -4,6 +4,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import teo.springjwt.product.dto.CreateGroupDTO;
 import teo.springjwt.product.entity.OptionGroupEntity;
 import teo.springjwt.product.repository.group.OptionGroupEntityRepository;
 
@@ -17,5 +18,15 @@ public class GroupService {
 
   public List<OptionGroupEntity> getGroups() {
     return groupRepository.findAll();
+  }
+
+  public OptionGroupEntity createGroup(CreateGroupDTO dto) {
+    if (groupRepository.existsByName(dto.getName())) {
+      throw new IllegalArgumentException("type with name '" + dto.getName() + "' already exists.");
+    }
+    OptionGroupEntity group = new OptionGroupEntity(dto.getName(), dto.getDisplayOrder());
+    groupRepository.save(group);
+
+    return group;
   }
 }

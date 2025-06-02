@@ -10,6 +10,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
@@ -26,6 +27,10 @@ public class OptionGroupEntity extends BaseTimeEntity {
   @Column(name = "option_group_id")
   private Long id;
 
+  @NotNull(message = "순서는 필수입니다.")
+  @Column(name = "display_order", nullable = false)
+  private int displayOrder;
+
   @NotBlank(message = "옵션 이름은 필수입니다")
   @Column(name = "option_name", nullable = false)
   private String name; // 예: "색상", "사이즈", "재질"
@@ -37,6 +42,12 @@ public class OptionGroupEntity extends BaseTimeEntity {
   // cascade = CascadeType.ALL, orphanRemoval = true: OptionGroup 삭제 시 연관된 OptionValue도 함께 삭제
   @OneToMany(mappedBy = "optionGroup", cascade = ALL, orphanRemoval = true, fetch = LAZY)
   private List<OptionValueEntity> optionValues = new ArrayList<>();
+
+  // Constructor
+  public OptionGroupEntity(String name,int displayOrder) {
+    this.displayOrder = displayOrder;
+    this.name = name;
+  }
 
   // Business method to update name
   public void updateName(String newName) {
