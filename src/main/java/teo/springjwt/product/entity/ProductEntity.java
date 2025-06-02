@@ -90,19 +90,6 @@ public class ProductEntity extends BaseTimeEntity {
     }
   }
 
-  public void addOptionGroup(OptionGroupEntity optionGroup) {
-    if (optionGroup != null && !this.optionGroups.contains(optionGroup)) {
-      this.optionGroups.add(optionGroup);
-      optionGroup.setProduct(this);
-    }
-  }
-
-  public void removeOptionGroup(OptionGroupEntity optionGroup) {
-    if (optionGroup != null && this.optionGroups.remove(optionGroup)) {
-      optionGroup.setProduct(null);
-    }
-  }
-
   public void addSku(SkuEntity sku) {
     if (sku != null && !this.skus.contains(sku)) {
       this.skus.add(sku);
