@@ -55,17 +55,21 @@ public class CategoryEntity extends BaseTimeEntity { // 생성, 수정 시간 �
     @OneToMany(mappedBy = "parentCategory", cascade = ALL, orphanRemoval = true, fetch = LAZY)
     private List<CategoryEntity> childCategories = new ArrayList<>();
 
+    // ⭐⭐⭐ 핵심: equals()와 hashCode() 구현 시 연관관계 필드 (특히 컬렉션)를 포함하지 않습니다. ⭐⭐⭐
+    // 일반적으로 id만 사용하는 것이 안전합니다.
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        // JPA 프록시를 고려하여 getClass() 대신 instanceof 사용
+        if (!(o instanceof CategoryEntity)) return false;
         CategoryEntity that = (CategoryEntity) o;
+        // id가 null일 수 있는 경우 (저장 전)와 영속화된 경우를 모두 고려
         return id != null && id.equals(that.id);
     }
 
     @Override
     public int hashCode() {
-        return id != null ? id.hashCode() : 0;
+        return id != null ? id.hashCode() : 0; // id가 null일 경우 0 반환 (저장 전)
     }
 
     // --- 생성자 ---
