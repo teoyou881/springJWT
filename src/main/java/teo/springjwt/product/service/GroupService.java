@@ -29,4 +29,11 @@ public class GroupService {
 
     return group;
   }
+
+  public OptionGroupEntity deleteGroup(Long id) {
+    OptionGroupEntity group = groupRepository.findById(id)
+                                             .orElseThrow(() -> new IllegalArgumentException("type not found with ID: " + id));
+    groupRepository.delete(group);
+    return group;
+  }
 }

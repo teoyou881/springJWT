@@ -4,7 +4,9 @@ import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,5 +33,11 @@ public class GroupController {
       CreateGroupDTO requestDto) {
     groupService.createGroup(requestDto);
     return ResponseEntity.ok("Group created successfully");
+  }
+
+  @DeleteMapping("{id}")
+  public ResponseEntity<String> deleteOptionType(@PathVariable Long id) {
+    groupService.deleteGroup(id);
+    return ResponseEntity.ok("Group deleted successfully");
   }
 }
