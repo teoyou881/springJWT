@@ -59,10 +59,8 @@ public class ProductEntity extends BaseTimeEntity {
    * sku는 실제 고객이 구매 가능한 재고, 가격등을 보여준다.
    * */
 
-  // OptionGroup과 1:N 관계 (양방향 매핑)
-  // cascade = CascadeType.ALL, orphanRemoval = true: Product 삭제 시 연관된 OptionGroup도 함께 삭제
   @OneToMany(mappedBy = "product", cascade = ALL, orphanRemoval = true, fetch = LAZY)
-  private List<OptionGroupEntity> optionGroups = new ArrayList<>();
+  private List<ProductOptionGroupEntity> productOptionGroups = new ArrayList<>();
 
   // Sku와 1:N 관계 (양방향 매핑)
   // cascade = CascadeType.ALL, orphanRemoval = true: Product 삭제 시 연관된 Sku도 함께 삭제
