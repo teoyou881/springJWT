@@ -6,4 +6,6 @@ import teo.springjwt.product.entity.OptionValueEntity;
 public interface OptionValueEntityRepository extends JpaRepository<OptionValueEntity, Long>,
     OptionValueEntityRepositoryCustom {
 
+  boolean existsByName(String name
+  );
 }

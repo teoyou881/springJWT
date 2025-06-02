@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import teo.springjwt.product.dto.CreateGroupDTO;
-import teo.springjwt.product.entity.OptionGroupEntity;
 import teo.springjwt.product.service.GroupService;
 
 @RestController
@@ -23,7 +22,7 @@ public class GroupController {
   private final GroupService groupService;
 
   @GetMapping
-  public List<OptionGroupEntity> getOptionTypes() {
+  public List<ResponseGroupDTO> getOptionTypes() {
     return groupService.getGroups();
   }
 
