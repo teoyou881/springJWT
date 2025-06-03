@@ -1,5 +1,6 @@
 package teo.springjwt.product.entity;
 
+import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.FetchType.LAZY;
 
 import jakarta.persistence.Column;
@@ -9,7 +10,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -41,6 +45,10 @@ public class ProductOptionGroupEntity extends BaseTimeEntity {
   @Column(name = "display_order", nullable = false)
   private int displayOrder; // 상품 내에서 이 옵션 그룹이 보여지는 순서
 
+  // ⭐ ProductOptionValueEntity 리스트 추가 (이 부분이 먼저 적용되어야 합니다)
+  @OneToMany(mappedBy = "productOptionGroup", cascade = ALL, orphanRemoval = true, fetch = LAZY)
+  private List<ProductOptionValueEntity> productOptionValues = new ArrayList<>();
+
   @Builder
   public ProductOptionGroupEntity(ProductEntity product, OptionGroupEntity optionGroup, int displayOrder) {
     this.product = product;
@@ -59,5 +67,13 @@ public class ProductOptionGroupEntity extends BaseTimeEntity {
 
   public void updateDisplayOrder(int displayOrder) {
     this.displayOrder = displayOrder;
+  }
+
+  public void addOptionValue(ProductOptionValueEntity productOptionValue){
+    if (productOptionValue != null && !this.productOptionValues.contains(productOptionValue)) {
+      this.productOptionValues.add(productOptionValue);
+      // 양방향 관계 설정을 위해 ProductOptionValueEntity의 setProductOptionGroup 메서드 호출
+      productOptionValue.setProductOptionGroup(this);
+    }
   }
 }

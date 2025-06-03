@@ -1,5 +1,8 @@
 package teo.springjwt.product.entity;
 
+import static jakarta.persistence.CascadeType.ALL;
+import static jakarta.persistence.FetchType.LAZY;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -8,9 +11,12 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -47,6 +53,9 @@ public class OptionValueEntity extends BaseTimeEntity {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "option_group_id", nullable = false) // 외래 키 컬럼명
   private OptionGroupEntity optionGroup; // 연관관계의 주인
+
+  @OneToMany(mappedBy = "optionValue", cascade = ALL, orphanRemoval = true, fetch = LAZY)
+  private List<ProductOptionValueEntity> productOptionValues = new ArrayList<>();
 
   @Builder
   public OptionValueEntity(String valueName, BigDecimal extraPrice, OptionGroupEntity optionGroup, int displayOrder) {

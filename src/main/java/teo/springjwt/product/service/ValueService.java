@@ -5,8 +5,8 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import teo.springjwt.product.controller.ResponseValueDTO;
 import teo.springjwt.product.dto.CreateValueDTO;
+import teo.springjwt.product.dto.ResponseValueDTO;
 import teo.springjwt.product.entity.OptionGroupEntity;
 import teo.springjwt.product.entity.OptionValueEntity;
 import teo.springjwt.product.repository.group.OptionGroupEntityRepository;
@@ -22,6 +22,7 @@ public class ValueService {
 
   public List<ResponseValueDTO> getValues() {
     List<OptionValueEntity> all = valueRepository.findAll();
+    System.out.println("all = " + all);
     return all.stream().map(ResponseValueDTO::fromEntityFlat).toList();
   }
 

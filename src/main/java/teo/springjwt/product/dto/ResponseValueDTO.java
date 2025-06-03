@@ -1,4 +1,4 @@
-package teo.springjwt.product.controller;
+package teo.springjwt.product.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

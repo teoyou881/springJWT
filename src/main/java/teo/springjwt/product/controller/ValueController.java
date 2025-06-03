@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import teo.springjwt.product.dto.CreateValueDTO;
+import teo.springjwt.product.dto.ResponseValueDTO;
 import teo.springjwt.product.service.ValueService;
 
 @RestController

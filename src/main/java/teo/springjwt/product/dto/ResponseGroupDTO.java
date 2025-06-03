@@ -1,4 +1,4 @@
-package teo.springjwt.product.controller;
+package teo.springjwt.product.dto;
 
 import java.time.LocalDateTime;
 import java.util.List;

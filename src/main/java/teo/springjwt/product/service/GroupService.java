@@ -4,8 +4,9 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import teo.springjwt.product.controller.ResponseGroupDTO;
 import teo.springjwt.product.dto.CreateGroupDTO;
+import teo.springjwt.product.dto.ResponseGroupDTO;
+import teo.springjwt.product.dto.ResponseValueDTO;
 import teo.springjwt.product.entity.OptionGroupEntity;
 import teo.springjwt.product.repository.group.OptionGroupEntityRepository;
 
@@ -20,6 +21,12 @@ public class GroupService {
   public List<ResponseGroupDTO> getGroups() {
     List<OptionGroupEntity> all = groupRepository.findAll();
     return all.stream().map(ResponseGroupDTO::fromEntity).toList();
+  }
+
+  public List<ResponseValueDTO> findOptionValuesByOptionGroupId(Long id) {
+    OptionGroupEntity group = groupRepository.findById(id)
+                                             .orElseThrow(() -> new IllegalArgumentException("type not found with ID: " + id));
+    return group.getOptionValues().stream().map(ResponseValueDTO::fromEntityFlat).toList();
   }
 
   public OptionGroupEntity createGroup(CreateGroupDTO dto) {
@@ -38,4 +45,6 @@ public class GroupService {
     groupRepository.delete(group);
     return group;
   }
+
+
 }

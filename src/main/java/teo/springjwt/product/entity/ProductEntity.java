@@ -42,7 +42,9 @@ public class ProductEntity extends BaseTimeEntity {
   @JoinColumn(name = "category_id", nullable = false) // A product must belong to a category
   private CategoryEntity category;
 
-  @Column(nullable = false)
+  //생성은 이미지와 따로 하고, 나중에 이미지를 등록할 때, sku를 가지고 와서 등록하는 방식으로.
+  //null 을 허용해주자.
+  @Column(nullable = true)
   @OneToMany(mappedBy = "product", cascade = ALL, orphanRemoval = true, fetch = LAZY)
   private List<ImageUrlEntity> images = new ArrayList<>(); // 이미지 엔티티 리스트
 
@@ -58,7 +60,6 @@ public class ProductEntity extends BaseTimeEntity {
    * groups는 선택가능한 옵션을 보여주고,
    * sku는 실제 고객이 구매 가능한 재고, 가격등을 보여준다.
    * */
-
   @OneToMany(mappedBy = "product", cascade = ALL, orphanRemoval = true, fetch = LAZY)
   private List<ProductOptionGroupEntity> productOptionGroups = new ArrayList<>();
 
@@ -73,6 +74,14 @@ public class ProductEntity extends BaseTimeEntity {
     this.description = desc;
     if (category != null) {
       this.category = category;
+    }
+  }
+
+  //양방향
+  public void addProductOptionGroup(ProductOptionGroupEntity productOptionGroup) {
+    if (productOptionGroup != null && !this.productOptionGroups.contains(productOptionGroup)) {
+      this.productOptionGroups.add(productOptionGroup);
+      productOptionGroup.setProduct(this); // ProductOptionGroupEntity에 setProduct 메서드 호출
     }
   }
 
