@@ -14,6 +14,7 @@ import teo.springjwt.product.entity.ImageUrlEntity;
 public class ResponseImageDto {
   private Long id; // image_url_id
   private String imageUrl; // 이미지 URL
+  private String originalFileName; // 원본 파일명 (사용자 친화적인 이름)
   private int displayOrder; // 표시 순서
   private boolean isThumbnail; // 썸네일 여부
 
@@ -41,6 +42,7 @@ public class ResponseImageDto {
     return ResponseImageDto.builder()
                            .id(entity.getId())
                            .imageUrl(entity.getImageUrl())
+                           .originalFileName(entity.getOriginalFileName())
                            .displayOrder(entity.getDisplayOrder())
                            .isThumbnail(entity.isThumbnail())
                            .skuId(skuId)
