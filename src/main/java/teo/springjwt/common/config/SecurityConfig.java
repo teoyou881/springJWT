@@ -35,6 +35,11 @@ public class SecurityConfig {
   }
 
   // AuthenticationManager Bean 등록
+  //security 5.xx 버전부터는 명시적으로 등록할 필요는 사실 없다.
+  // 언제 등록하냐?
+  // 1. 커스텀 인증 로직 복잡하고, 기존 자동 구성방식으로는 해결이 안되서 builder를 사용해서 세밀하게 작업해야 할때,
+  // 2. 다른 빈에서 직접 주입받아 사용해야 하는 경우, (이 때도, 자동 등록된 것을 사용해도 된다.)
+  // 3. 레거시 코드와의 호환성이 필요한 경우.
   @Bean
   public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
 
