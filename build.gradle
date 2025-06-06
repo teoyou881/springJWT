@@ -49,6 +49,9 @@ dependencies {
 
     //spy6
     implementation "com.github.gavlyukovskiy:datasource-decorator-spring-boot-autoconfigure:1.11.0"
+
+    //cloudinary
+    implementation 'com.cloudinary:cloudinary-http44:1.39.0' // 최신 버전을 확인하세요
 }
 
 tasks.named('test') {
