@@ -32,7 +32,7 @@ public class CategoryEntity extends BaseTimeEntity { // 생성, 수정 시간 �
     @Column(name = "category_id")
     private Long id;
 
-    @Column(name = "name", nullable = false, unique = true)
+    @Column(name = "name", nullable = false)
     private String name; // 카테고리 이름 (예: "의류", "상의", "하의")
 
     @Column(nullable = false)
