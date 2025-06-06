@@ -62,9 +62,11 @@ public class CategoryService {
 
   //create
   public CategoryEntity createCategory(CategoryCreateDTO request) {
-    if (categoryRepository.existsByName(request.getName())) {
-      throw new IllegalArgumentException("Category with name '" + request.getName() + "' already exists.");
-    }
+    // 중복을 허용한다.
+    // same name category is allowed because men and women can have the same name category
+    // if (categoryRepository.existsByName(request.getName())) {
+    //   throw new IllegalArgumentException("Category with name '" + request.getName() + "' already exists.");
+    // }
 
     CategoryEntity parentCategory = null;
     // request.getParentId()가 null이 아닌 경우, 부모 카테고리 조회
