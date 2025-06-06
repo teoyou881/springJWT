@@ -16,16 +16,14 @@ public class ResponseSkuDTO {
   private BigDecimal price;
   private int stock;
   private String thumbnailUrl; // 썸네일 이미지 URL
-  private List<String> imageUrls; // 모든 이미지 URL 목록
+  private List<ResponseImageDto> images; // 모든 이미지 URL 목록 --> responseImageDto로 변경
   private List<ResponseSkuOptionValueDTO> optionValues;
 
   // Entity에서 DTO로 변환
   public static ResponseSkuDTO fromEntity(SkuEntity skuEntity) {
     // 이미지 URL 목록 생성
-    List<String> imageUrls = skuEntity.getImages().stream()
-        .map(image -> image.getImageUrl())
-        .collect(Collectors.toList());
-    
+    List<ResponseImageDto> images = skuEntity.getImages().stream().map(ResponseImageDto::fromEntity).toList();
+
     // 썸네일 URL 찾기
     String thumbnailUrl = skuEntity.getThumbnailUrl();
 
@@ -41,7 +39,7 @@ public class ResponseSkuDTO {
         .price(skuEntity.getPrice())
         .stock(skuEntity.getStock())
         .thumbnailUrl(thumbnailUrl)
-        .imageUrls(imageUrls)
+        .images(images)
         .optionValues(optionValues)
         .build();
   }
