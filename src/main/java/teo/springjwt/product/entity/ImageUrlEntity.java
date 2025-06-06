@@ -1,9 +1,11 @@
 package teo.springjwt.product.entity;
 
+import static jakarta.persistence.FetchType.LAZY;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -19,34 +21,36 @@ import teo.springjwt.common.entity.BaseTimeEntity;
 public class ImageUrlEntity extends BaseTimeEntity {
 
   @Id
-  @GeneratedValue
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "image_url_id")
   private Long id;
 
-  @NotNull(message="이미지 이름은 필수입니다..")
+  @NotNull(message = "이미지 URL은 필수입니다")
   @Column(name = "image_url", nullable = false)
   private String imageUrl;
 
-  @Column(name = "display_order", nullable = false) // Order is important for display
+  @NotNull(message = "이미지 이름은 필수입니다.")
+  @Column(length = 255)
+  private String originalFileName;
+
+  @Column(name = "display_order", nullable = false)
   private int displayOrder;
 
-  @Column(name = "is_thumbnail", nullable = false) // Is it a thumbnail?
+  @Column(name = "is_thumbnail", nullable = false)
   private boolean isThumbnail;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "product_id",nullable = false)
-  private ProductEntity product;
+  // ProductEntity에서 SkuEntity로 연관관계 변경
+  @ManyToOne(fetch = LAZY)
+  @JoinColumn(name = "sku_id", nullable = false)
+  private SkuEntity sku;
 
   // Constructor for mandatory fields
-  public ImageUrlEntity(String imageUrl, int displayOrder, boolean isThumbnail, ProductEntity product) {
-    if (imageUrl == null || imageUrl.trim().isEmpty()) throw new IllegalArgumentException("Image URL is required.");
-    if (displayOrder < 0) throw new IllegalArgumentException("Display order must be non-negative.");
-    if (product == null) throw new IllegalArgumentException("Product is required for image.");
-
+  public ImageUrlEntity(String imageUrl, String originalFileName, int displayOrder, boolean isThumbnail, SkuEntity sku) {
     this.imageUrl = imageUrl;
+    this.originalFileName = originalFileName; // 원본 파일명 포함
     this.displayOrder = displayOrder;
     this.isThumbnail = isThumbnail;
-    this.product = product;
+    this.sku = sku;
   }
 
   // Business methods
@@ -67,7 +71,7 @@ public class ImageUrlEntity extends BaseTimeEntity {
   }
 
   // Bidirectional link helper
-  public void setProduct(ProductEntity product) {
-    this.product = product;
+  public void setSku(SkuEntity sku) {
+    this.sku = sku;
   }
 }
