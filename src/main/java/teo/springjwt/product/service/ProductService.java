@@ -5,6 +5,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import teo.springjwt.category.CategoryEntity;
@@ -37,8 +39,11 @@ public class ProductService {
   private final SkuRepository skuRepository;
   private final SkuOptionValueRepository skuOptionValueRepository;
 
-  public List<ResponseProductEntity> getAllProducts() {
-    return productRepository.findAll().stream().map(ResponseProductEntity::from).toList();
+  public Page<ResponseProductEntity> getAllProducts(String name, String skuCode, Pageable pageable) {
+    return productRepository.findAllProductsWithMinPriceAndMaxPrice(
+        name,
+        skuCode,
+        pageable);
   }
 
   public ProductEntity  createProduct(ProductCreateRequest request) {
