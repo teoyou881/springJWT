@@ -60,6 +60,20 @@ public class ProductEntity extends BaseTimeEntity {
     }
   }
 
+  @Override
+  public final boolean equals(Object o) {
+    if (!(o instanceof ProductEntity that)) {
+      return false;
+    }
+
+    return getId().equals(that.getId());
+  }
+
+  @Override
+  public int hashCode() {
+    return getId().hashCode();
+  }
+
   // 양방향 관계 편의 메서드들
   public void addProductOptionGroup(ProductOptionGroupEntity productOptionGroup) {
     if (productOptionGroup != null && !this.productOptionGroups.contains(productOptionGroup)) {

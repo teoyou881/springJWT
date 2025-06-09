@@ -39,6 +39,10 @@ public class ResponseProductEntity {
     this.lastModifiedDate = lastModifiedDate;
   }
 
+  public void setThumbnailUrl(String thumbnailUrl) {
+    this.thumbnailUrl = thumbnailUrl;
+  }
+
   // Entity to DTO 변환 메서드 (SKU에서 썸네일 URL 가져오도록 수정)
   public static ResponseProductEntity from(ProductEntity productEntity, BigDecimal minPrice, BigDecimal maxPrice) {
     // SKU들 중에서 썸네일 이미지 찾기

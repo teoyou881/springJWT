@@ -6,6 +6,8 @@ import static teo.springjwt.product.entity.QProductEntity.productEntity;
 import static teo.springjwt.product.entity.QSkuEntity.skuEntity;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.Tuple;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -36,12 +38,8 @@ public class ProductEntityRepositoryCustomImpl implements ProductEntityRepositor
             productEntity.description,
             categoryEntity.id,
             categoryEntity.name,
-            // SKU의 이미지에서 썸네일 이미지 서브쿼리로 변경
-            JPAExpressions.select(imageUrlEntity.imageUrl)
-                          .from(imageUrlEntity)
-                          .where(imageUrlEntity.sku.product.eq(productEntity)
-                                                           .and(imageUrlEntity.isThumbnail.eq(true)))
-                          .limit(1),
+            // 썸네일 제외, 나중에 채울거다.
+            Expressions.nullExpression(),
             skuEntity.price.min(), // SKU 최소 가격
             skuEntity.price.max(), // SKU 최대 가격
             productEntity.createdDate,
@@ -97,6 +95,26 @@ public class ProductEntityRepositoryCustomImpl implements ProductEntityRepositor
 
     // 쿼리 실행
     List<ResponseProductEntity> content = query.fetch();
+
+
+    // productId 리스트로 얻어오기
+    List<Long> ids = content.stream().map(ResponseProductEntity::getId).toList();
+
+    //sku 상품 아아디, 이미지 url 리스트로 얻어오기
+    List<Tuple> productIdToThumbnail = queryFactory
+        .select(imageUrlEntity.sku.product.id, imageUrlEntity.imageUrl)
+        .from(imageUrlEntity)
+        .where(imageUrlEntity.isThumbnail.eq(true).and(imageUrlEntity.sku.product.id.in(ids)))
+        .fetch()
+        .stream()
+        .toList();
+
+
+    content.forEach(productEntity -> {
+      String imageUrl = String.valueOf(productIdToThumbnail.get(Math.toIntExact(productEntity.getId())));
+      productEntity.setThumbnailUrl(imageUrl);  // setter 필요
+    });
+
 
     // 총 카운트 쿼리
     JPAQuery<Long> countQuery = queryFactory

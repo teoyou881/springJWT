@@ -10,6 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotNull;
+import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -35,6 +36,20 @@ public class ImageUrlEntity extends BaseTimeEntity {
 
   @Column(name = "display_order", nullable = false)
   private int displayOrder;
+
+  @Override
+  public final boolean equals(Object o) {
+    if (!(o instanceof ImageUrlEntity that)) {
+      return false;
+    }
+
+    return Objects.equals(getId(), that.getId());
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(getId());
+  }
 
   @Column(name = "is_thumbnail", nullable = false)
   private boolean isThumbnail;
