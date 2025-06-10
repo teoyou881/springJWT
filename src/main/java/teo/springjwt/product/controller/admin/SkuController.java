@@ -1,4 +1,4 @@
-package teo.springjwt.product.controller;
+package teo.springjwt.product.controller.admin;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;

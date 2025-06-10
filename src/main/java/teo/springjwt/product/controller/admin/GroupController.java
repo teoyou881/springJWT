@@ -1,4 +1,4 @@
-package teo.springjwt.product.controller;
+package teo.springjwt.product.controller.admin;
 
 import jakarta.validation.Valid;
 import java.util.List;
