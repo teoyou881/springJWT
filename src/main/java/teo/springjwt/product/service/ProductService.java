@@ -7,6 +7,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import teo.springjwt.category.CategoryEntity;
@@ -39,14 +40,27 @@ public class ProductService {
   private final SkuRepository skuRepository;
   private final SkuOptionValueRepository skuOptionValueRepository;
 
-  public Page<ResponseProductEntity> getAllProducts(String name, String skuCode, Pageable pageable) {
+  public ResponseEntity<List<ResponseProductEntity>> getAllProducts() {
+    List<ProductEntity> all = productRepository.findAll();
+
+    BigDecimal minPrice = all.stream().flatMap(product -> product.getSkus().stream())
+                               // 각 SkuEntity에서 price 필드(double)를 추출합니다.
+                               .map(SkuEntity::getPrice).findFirst().orElseThrow();
+
+    List<ResponseProductEntity> list = productRepository.findAll().stream().map(ResponseProductEntity::from).toList();
+    list.forEach(product -> product.setMinPrice(minPrice));
+    return ResponseEntity.ok(list);
+  }
+  public Page<ResponseProductEntity> getAllProductsWithMinPriceAndMaxPrice(String name, String skuCode, Pageable pageable) {
     return productRepository.findAllProductsWithMinPriceAndMaxPrice(
         name,
         skuCode,
         pageable);
   }
 
-  public ProductEntity  createProduct(ProductCreateRequest request) {
+
+
+  public ProductEntity createProduct(ProductCreateRequest request) {
 
     // 1. CategoryEntity 조회
     CategoryEntity category = categoryRepository.findById(request.getCategoryId())
@@ -166,4 +180,5 @@ public class ProductService {
       currentCombination.remove(currentCombination.size() - 1); // 백트래킹: 다음 조합을 위해 마지막 추가된 값 제거
     }
   }
+
 }
