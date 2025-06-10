@@ -3,6 +3,8 @@ package teo.springjwt.product.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import java.io.IOException;
+import java.util.Comparator;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,13 +50,33 @@ public class ImageService {
     return  ResponseImageDto.fromEntity(save);
   }
 
-  public void removeImageFromSku(Long imageId) {
-    ImageUrlEntity image = imageUrlRepository.findById(imageId)
-                                             .orElseThrow(() -> new EntityNotFoundException("Image not found with ID: " + imageId));
+  public List<ResponseImageDto> removeImageFromSku(Long imageId) {
+    ImageUrlEntity image = imageUrlRepository.findById(imageId).orElseThrow(() -> new EntityNotFoundException(
+        "Image not found with ID: " + imageId));
 
     SkuEntity sku = image.getSku();
     sku.removeImage(image);
     imageUrlRepository.delete(image);
+
+
+    // 지운 이미지가 썸네일이였을 경우를 체크
+    // 그렇다면, 썸네일이 없기 때문에 아이디를 기준으로 가장 낮은 아이디의 이미지를 썸네일로 지정해주자.
+    String Thumb = sku
+        .getImages()
+        .stream()
+        .filter(ImageUrlEntity::isThumbnail)
+        .findFirst()
+        .map(ImageUrlEntity::getImageUrl)
+        .orElseGet(() -> null);
+
+    if(Thumb == null) {
+      sku.getImages()
+         .stream()
+         .min(Comparator.comparing(ImageUrlEntity::getId))
+         .ifPresent(sku::setThumbnail);
+    }
+
+  return sku.getImages().stream().map(ResponseImageDto::fromEntity).toList();
   }
 
   public void setAsThumbnail(Long imageId) {
