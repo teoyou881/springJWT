@@ -12,6 +12,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
+import jakarta.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
@@ -42,6 +43,8 @@ public class UserEntity extends BaseTimeEntity {
   // 일단 옵션으로
   @Column(name = "username", length = 100)
   private String username;
+
+  @Size(min = 6, message = "비밀번호는 6자 이상 50자 이하여야 합니다.")
   @Column(name = "password", nullable = false, length = 255) // 비밀번호 컬럼, 필수 (암호화된 비밀번호 저장)
   private String password;
 
@@ -74,10 +77,21 @@ public class UserEntity extends BaseTimeEntity {
   @OneToMany(mappedBy = "user", cascade = ALL, orphanRemoval = true, fetch = LAZY) // Add cascade for review management if desired
   private List<ReviewEntity> reviews = new ArrayList<>();
 
+  // for Register
+  public UserEntity(String email, String password, UserRole role, String username, String phoneNumber) {
+    this.email = email;
+    this.password = password;
+    this.role = role;
+    this.username = username;
+    this.phoneNumber = phoneNumber;
+  }
+
+  // for JWTFilter
   public UserEntity(String email, String password, UserRole role) {
     this.email = email;
     this.password = password;
     this.role = role;
+
   }
 
   // --- 비즈니스 로직 메서드 (Setter 대신) ---

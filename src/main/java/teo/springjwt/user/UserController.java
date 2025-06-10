@@ -1,24 +1,26 @@
 package teo.springjwt.user;
 
+import jakarta.validation.Valid;
 import java.security.Principal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import teo.springjwt.user.dto.RegisterDTO;
+import teo.springjwt.user.dto.RequestRegisterDTO;
 import teo.springjwt.user.entity.UserEntity;
-import teo.springjwt.user.service.SignUpService;
+import teo.springjwt.user.service.UserService;
 
 @RestController
 @RequiredArgsConstructor
 public class UserController {
 
- private final  SignUpService signUpService;
+ private final UserService userService;
 
   @PostMapping("/user")
-  public String signUp(RegisterDTO registerDTO) {
-    signUpService.signUpProcess(registerDTO);
+  public String signUp(@Valid @RequestBody RequestRegisterDTO requestRegisterDTO) {
+    userService.signUpProcess(requestRegisterDTO);
     return "ok";
   }
 
