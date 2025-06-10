@@ -39,10 +39,6 @@ public class ResponseProductEntity {
     this.lastModifiedDate = lastModifiedDate;
   }
 
-  public void setThumbnailUrl(String thumbnailUrl) {
-    this.thumbnailUrl = thumbnailUrl;
-  }
-
   // Entity to DTO 변환 메서드 (SKU에서 썸네일 URL 가져오도록 수정)
   public static ResponseProductEntity from(ProductEntity productEntity, BigDecimal minPrice, BigDecimal maxPrice) {
     // SKU들 중에서 썸네일 이미지 찾기
@@ -66,4 +62,39 @@ public class ResponseProductEntity {
         .lastModifiedDate(productEntity.getLastModifiedDate())
         .build();
   }
+
+  public static ResponseProductEntity from(ProductEntity productEntity) {
+    // SKU들 중에서 썸네일 이미지 찾기
+    String thumbnailUrl = productEntity.getSkus().stream()
+                                       .flatMap(sku -> sku.getImages().stream())
+                                       .filter(ImageUrlEntity::isThumbnail)
+                                       .map(ImageUrlEntity::getImageUrl)
+                                       .findFirst()
+                                       .orElse(null);
+
+    return ResponseProductEntity.builder()
+                                .id(productEntity.getId())
+                                .name(productEntity.getName())
+                                .description(productEntity.getDescription())
+                                .categoryId(productEntity.getCategory().getId())
+                                .categoryName(productEntity.getCategory().getName())
+                                .thumbnailUrl(thumbnailUrl) // SKU에서 가져온 썸네일
+                                .createdDate(productEntity.getCreatedDate())
+                                .lastModifiedDate(productEntity.getLastModifiedDate())
+                                .build();
+  }
+
+
+  public void setThumbnailUrl(String thumbnailUrl) {
+    this.thumbnailUrl = thumbnailUrl;
+  }
+
+  public void setMinPrice(BigDecimal minPrice) {
+    this.minPrice = minPrice;
+  }
+
+  public void setMaxPrice(BigDecimal maxPrice) {
+    this.maxPrice = maxPrice;
+  }
+
 }
