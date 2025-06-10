@@ -1,9 +1,11 @@
-package teo.springjwt.product.controller;
+package teo.springjwt.product.controller.admin;
 
+import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -73,5 +75,12 @@ public class ImageController {
 
     imageService.setAsThumbnail(imageId);
     return ResponseEntity.ok("Thumbnail updated successfully");
+  }
+
+  @DeleteMapping("/images/{imageId}")
+  public ResponseEntity<List<ResponseImageDto>> deleteSingleFile(
+    @PathVariable Long imageId
+  ){
+    return ResponseEntity.ok( imageService.removeImageFromSku(imageId));
   }
 }
