@@ -13,6 +13,8 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
@@ -96,25 +98,32 @@ public class ProductEntityRepositoryCustomImpl implements ProductEntityRepositor
     // 쿼리 실행
     List<ResponseProductEntity> content = query.fetch();
 
-
     // productId 리스트로 얻어오기
     List<Long> ids = content.stream().map(ResponseProductEntity::getId).toList();
 
-    //sku 상품 아아디, 이미지 url 리스트로 얻어오기
-    List<Tuple> productIdToThumbnail = queryFactory
-        .select(imageUrlEntity.sku.product.id, imageUrlEntity.imageUrl)
-        .from(imageUrlEntity)
-        .where(imageUrlEntity.isThumbnail.eq(true).and(imageUrlEntity.sku.product.id.in(ids)))
-        .fetch()
-        .stream()
-        .toList();
+    // 썸네일 이미지가 있는 경우에만 조회
+    if (!ids.isEmpty()) {
+      // 상품 ID와 이미지 URL을 Map으로 변환
+      List<Tuple> productIdToThumbnailList = queryFactory
+          .select(imageUrlEntity.sku.product.id, imageUrlEntity.imageUrl)
+          .from(imageUrlEntity)
+          .where(imageUrlEntity.isThumbnail.eq(true).and(imageUrlEntity.sku.product.id.in(ids)))
+          .fetch();
 
+      // Tuple 리스트를 Map으로 변환
+      Map<Long, String> productIdToThumbnailMap = productIdToThumbnailList.stream()
+          .collect(Collectors.toMap(
+              tuple -> tuple.get(imageUrlEntity.sku.product.id),
+              tuple -> tuple.get(imageUrlEntity.imageUrl),
+              (existing, replacement) -> existing // 중복된 키가 있을 경우 기존 값 유지
+          ));
 
-    content.forEach(productEntity -> {
-      String imageUrl = String.valueOf(productIdToThumbnail.get(Math.toIntExact(productEntity.getId())));
-      productEntity.setThumbnailUrl(imageUrl);  // setter 필요
-    });
-
+      // 각 상품에 썸네일 URL 설정
+      content.forEach(product -> {
+        String thumbnailUrl = productIdToThumbnailMap.get(product.getId());
+        product.setThumbnailUrl(thumbnailUrl != null ? thumbnailUrl : ""); // null인 경우 빈 문자열로 설정
+      });
+    }
 
     // 총 카운트 쿼리
     JPAQuery<Long> countQuery = queryFactory
