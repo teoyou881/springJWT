@@ -23,6 +23,10 @@ spring:
         format_sql: true
     show-sql: true
 
+  servlet:
+    multipart:
+      max-file-size: 10MB       # 단일 파일 최대 크기
+      max-request-size: 100MB   # 전체 요청 최대 크기 (모든 파일 및 폼 데이터 포함)
 
 jwt:
 #  base64로 인코딩된 값
