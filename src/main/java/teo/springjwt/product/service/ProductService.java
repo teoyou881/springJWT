@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import teo.springjwt.category.CategoryEntity;
 import teo.springjwt.category.repository.CategoryRepository;
 import teo.springjwt.product.dto.ResponseProductEntity;
+import teo.springjwt.product.dto.ResponseSkuDTO;
 import teo.springjwt.product.dto.request.ProductCreateRequest;
 import teo.springjwt.product.dto.request.ProductCreateRequest.ProductOptionGroupRequest;
 import teo.springjwt.product.dto.request.ProductCreateRequest.ProductOptionValueRequest;
@@ -181,4 +182,7 @@ public class ProductService {
     }
   }
 
+  public ResponseEntity<List<ResponseSkuDTO>> getProductById(Long productId) {
+    return ResponseEntity.ok(skuRepository.findBySkuWithProductId(productId).stream().map(ResponseSkuDTO::fromEntity).toList());
+  }
 }
