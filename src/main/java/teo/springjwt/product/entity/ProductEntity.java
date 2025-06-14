@@ -3,8 +3,10 @@ package teo.springjwt.product.entity;
 import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.FetchType.LAZY;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -12,6 +14,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
@@ -39,6 +42,7 @@ public class ProductEntity extends BaseTimeEntity {
   private String description;
 
   @ManyToOne(fetch = LAZY)
+  @NotNull(message = "카테고리는 필수입니다.")
   @JoinColumn(name = "category_id", nullable = false)
   private CategoryEntity category;
 
@@ -50,6 +54,9 @@ public class ProductEntity extends BaseTimeEntity {
 
   @OneToMany(mappedBy = "product", cascade = ALL, orphanRemoval = true, fetch = LAZY)
   private List<SkuEntity> skus = new ArrayList<>();
+
+  @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+  private List<ProductColorVariantEntity> colorVariants;
 
   // 생성자 (필수 필드 초기화)
   public ProductEntity(String name, String desc, CategoryEntity category) {
@@ -92,6 +99,12 @@ public class ProductEntity extends BaseTimeEntity {
   public void removeSku(SkuEntity sku) {
     if (sku != null && this.skus.remove(sku)) {
       sku.setProduct(null);
+    }
+  }
+
+  public void setColorVariants(List<ProductColorVariantEntity> colorVariants) {
+    if (colorVariants != null) {
+      this.colorVariants = colorVariants;
     }
   }
 

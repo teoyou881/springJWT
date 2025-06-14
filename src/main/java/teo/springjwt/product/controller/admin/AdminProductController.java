@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import teo.springjwt.product.dto.ResponseProductEntity;
-import teo.springjwt.product.dto.request.ProductCreateRequest;
+import teo.springjwt.product.dto.request.RequestProductCreate;
 import teo.springjwt.product.service.ProductService;
 
 @RestController
@@ -37,7 +37,7 @@ public class AdminProductController {
   public ResponseEntity<String> createProduct(
       @Valid
       @RequestBody
-      ProductCreateRequest dto) {
+      RequestProductCreate dto) {
     productService.createProduct(dto);
     return ResponseEntity.ok("Product created successfully");
   }

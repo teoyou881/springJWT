@@ -1,6 +1,6 @@
 package teo.springjwt.product.service;
 
-import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,11 +20,12 @@ public class SkuService {
 
   public List<ResponseSkuDTO> getAllOptionValueWithProductId(Long id) {
     List<SkuEntity> skuWithProductId = skuRepository.findBySkuWithProductId(id);
-    List<ResponseSkuDTO> responseSkus = new ArrayList<>();
-    for (SkuEntity skuEntity : skuWithProductId) {
-      responseSkus.add(ResponseSkuDTO.fromEntity(skuEntity));
-    }
-    return responseSkus;
+
+    return skuWithProductId
+        .stream()
+        .map(ResponseSkuDTO::fromEntity)
+        .sorted(Comparator.comparing(ResponseSkuDTO::getColor))
+        .toList();
   }
 
   public ResponseSkuDTO getSkuById(Long skuId) {

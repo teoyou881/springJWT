@@ -35,7 +35,7 @@ public class ImageController {
       return ResponseEntity.badRequest().body("이미지 파일을 선택해주세요.");
     }
     try {
-      ResponseImageDto uploadedImage = imageService.addImageToSku(skuId, imageFile, isThumbnail, displayOrder);
+      ResponseImageDto uploadedImage = imageService.addImageToColorVariant(skuId, imageFile, isThumbnail, displayOrder);
       return new ResponseEntity<ResponseImageDto>(uploadedImage, HttpStatus.CREATED); // 201 Created
     } catch (IllegalArgumentException e) {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST); // 유효성 검사 실패 시
@@ -81,6 +81,6 @@ public class ImageController {
   public ResponseEntity<List<ResponseImageDto>> deleteSingleFile(
     @PathVariable Long imageId
   ){
-    return ResponseEntity.ok( imageService.removeImageFromSku(imageId));
+    return ResponseEntity.ok( imageService.removeImageFromColorVariant(imageId));
   }
 }

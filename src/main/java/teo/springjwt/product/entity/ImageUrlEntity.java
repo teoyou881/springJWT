@@ -1,9 +1,8 @@
 package teo.springjwt.product.entity;
 
-import static jakarta.persistence.FetchType.LAZY;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -27,7 +26,7 @@ public class ImageUrlEntity extends BaseTimeEntity {
   private Long id;
 
   @NotNull(message = "이미지 URL은 필수입니다")
-  @Column(name = "image_url", nullable = false)
+  @Column(name = "image_url", nullable = false, length = 1024) // URL 길이에 맞춰 length 늘림
   private String imageUrl;
 
   @NotNull(message = "이미지 이름은 필수입니다.")
@@ -36,6 +35,13 @@ public class ImageUrlEntity extends BaseTimeEntity {
 
   @Column(name = "display_order", nullable = false)
   private int displayOrder;
+
+  @Column(name = "is_thumbnail", nullable = false)
+  private boolean isThumbnail;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "color_variant_id", nullable = false) // 어떤 ColorVariant에 속하는지 연결
+  private ProductColorVariantEntity colorVariant;
 
   @Override
   public final boolean equals(Object o) {
@@ -51,21 +57,14 @@ public class ImageUrlEntity extends BaseTimeEntity {
     return Objects.hashCode(getId());
   }
 
-  @Column(name = "is_thumbnail", nullable = false)
-  private boolean isThumbnail;
-
-  // ProductEntity에서 SkuEntity로 연관관계 변경
-  @ManyToOne(fetch = LAZY)
-  @JoinColumn(name = "sku_id", nullable = false)
-  private SkuEntity sku;
 
   // Constructor for mandatory fields
-  public ImageUrlEntity(String imageUrl, String originalFileName, int displayOrder, boolean isThumbnail, SkuEntity sku) {
+  public ImageUrlEntity(String imageUrl, String originalFileName, int displayOrder, boolean isThumbnail, ProductColorVariantEntity colorVariant) {
     this.imageUrl = imageUrl;
-    this.originalFileName = originalFileName; // 원본 파일명 포함
+    this.originalFileName = originalFileName;
     this.displayOrder = displayOrder;
     this.isThumbnail = isThumbnail;
-    this.sku = sku;
+    this.colorVariant = colorVariant; // ⭐ ProductColorVariantEntity를 받도록 변경
   }
 
   // Business methods
@@ -85,8 +84,8 @@ public class ImageUrlEntity extends BaseTimeEntity {
     this.isThumbnail = isThumbnail;
   }
 
-  // Bidirectional link helper
-  public void setSku(SkuEntity sku) {
-    this.sku = sku;
+  // set ColorVariant method
+  public void setColorVariant(ProductColorVariantEntity colorVariant) {
+    this.colorVariant = colorVariant;
   }
 }

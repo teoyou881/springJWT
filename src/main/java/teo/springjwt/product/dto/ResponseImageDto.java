@@ -18,14 +18,19 @@ public class ResponseImageDto {
   private int displayOrder; // 표시 순서
   private boolean isThumbnail; // 썸네일 여부
 
-  private Long skuId;
+  // ⭐ skuId 필드를 제거합니다.
+  // private Long skuId;
+
+  // ⭐ ProductColorVariantEntity의 ID를 추가합니다.
+  private Long colorVariantId;
+
 
   private LocalDateTime createdDate;
   private LocalDateTime lastModifiedDate;
 
   /**
    * ImageUrlEntity로부터 ResponseImageDto를 생성하는 팩토리 메서드.
-   * Product 및 SKU 정보를 포함합니다.
+   * ProductColorVariant 정보를 포함합니다.
    *
    * @param entity 변환할 ImageUrlEntity 객체
    * @return 생성된 ResponseImageDto 객체
@@ -34,9 +39,10 @@ public class ResponseImageDto {
     if (entity == null) {
       return null;
     }
-    Long skuId = null;
-    if (entity.getSku() != null) {
-      skuId = entity.getSku().getId();
+    // ⭐ skuId 관련 로직을 제거하고, colorVariantId 관련 로직으로 대체합니다.
+    Long colorVariantId = null;
+    if (entity.getColorVariant() != null) {
+      colorVariantId = entity.getColorVariant().getId();
     }
 
     return ResponseImageDto.builder()
@@ -45,7 +51,7 @@ public class ResponseImageDto {
                            .originalFileName(entity.getOriginalFileName())
                            .displayOrder(entity.getDisplayOrder())
                            .isThumbnail(entity.isThumbnail())
-                           .skuId(skuId)
+                           .colorVariantId(colorVariantId) // ⭐ colorVariantId를 설정합니다.
                            .createdDate(entity.getCreatedDate())
                            .lastModifiedDate(entity.getLastModifiedDate())
                            .build();

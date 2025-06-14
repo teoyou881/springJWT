@@ -5,14 +5,13 @@ import static jakarta.persistence.FetchType.LAZY;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -29,13 +28,8 @@ import teo.springjwt.common.entity.BaseTimeEntity;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(uniqueConstraints = { // Sku의 유일성을 위한 복합 유니크 제약 조건
-    // 하나의 상품 내에서 옵션 조합은 유일해야 함
-    @UniqueConstraint(columnNames = {"product_id", "option_color_id", "option_size_id"})
-    // 옵션이 3개 이상이라면 여기에 추가 (option_value3_id 등)
-})
 public class SkuEntity extends BaseTimeEntity {
-  
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "sku_id")
@@ -50,8 +44,8 @@ public class SkuEntity extends BaseTimeEntity {
   @Column(name = "stock", nullable = false)
   private int stock;
 
-  @Column(nullable = false)
-  private String name;
+  @Column(name = "sku_code", nullable = false, unique = true, length = 255) // unique = true 추가
+  private String name; // 이름을 skuCode로 사용하는 경우. 아니면 String skuCode; 필드 추가.
 
   @Column(nullable = true, length = 500)
   private String description;
@@ -61,20 +55,21 @@ public class SkuEntity extends BaseTimeEntity {
   @Column(name = "price", nullable = false, precision = 10, scale = 2)
   private BigDecimal price;
 
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "color_variant_id", nullable = false) // 어떤 색상 변형에 속하는지 연결 (핵심!)
+  private ProductColorVariantEntity colorVariant;
+
   @OneToMany(mappedBy = "sku", cascade = ALL, orphanRemoval = true, fetch = LAZY)
   private List<SkuOptionValueEntity> skuOptionValues = new ArrayList<>();
 
-  // 이미지와의 1:N 관계 추가
-  @OneToMany(mappedBy = "sku", cascade = ALL, orphanRemoval = true, fetch = LAZY)
-  private List<ImageUrlEntity> images = new ArrayList<>();
-
   @Builder
-  public SkuEntity(ProductEntity product, BigDecimal price, int stock, String name, String description) {
+  public SkuEntity(ProductEntity product, BigDecimal price, int stock, String name, String description, ProductColorVariantEntity colorVariant) {
     this.product = product;
     this.price = price;
     this.stock = stock;
-    this.name = name;
+    this.name = name; // 이제 이 name이 skuCode 역할을 합니다.
     this.description = description;
+    this.colorVariant = colorVariant;
   }
 
   @Override
@@ -82,6 +77,8 @@ public class SkuEntity extends BaseTimeEntity {
     if (this == o) return true;
     if (!(o instanceof SkuEntity)) return false;
     SkuEntity skuEntity = (SkuEntity) o;
+    // ⭐ id 대신 skuCode (name 필드)를 기준으로 equals/hashCode를 정의하는 것이 더 실용적일 수 있습니다.
+    //    id는 영속성 컨텍스트에 저장되기 전에는 null일 수 있기 때문입니다.
     return Objects.equals(id, skuEntity.id);
   }
 
@@ -99,39 +96,6 @@ public class SkuEntity extends BaseTimeEntity {
     if (skuOptionValue != null && !this.skuOptionValues.contains(skuOptionValue)) {
       this.skuOptionValues.add(skuOptionValue);
       skuOptionValue.setSku(this);
-    }
-  }
-
-  // 이미지 관련 편의 메서드들
-  public void addImage(ImageUrlEntity image) {
-    if (image != null && !this.images.contains(image)) {
-      this.images.add(image);
-      image.setSku(this);
-    }
-  }
-
-  public void removeImage(ImageUrlEntity image) {
-    if (image != null && this.images.remove(image)) {
-      image.setSku(null);
-    }
-  }
-
-  // 썸네일 이미지 URL 가져오기
-  public String getThumbnailUrl() {
-    return this.images.stream()
-                     .filter(ImageUrlEntity::isThumbnail)
-                     .map(ImageUrlEntity::getImageUrl)
-                     .findFirst()
-                     .orElse(null);
-  }
-
-  // 썸네일 설정 (기존 썸네일 해제 후 새로운 썸네일 설정)
-  public void setThumbnail(ImageUrlEntity newThumbnail) {
-    // 기존 썸네일 해제
-    this.images.forEach(image -> image.setAsThumbnail(false));
-    // 새로운 썸네일 설정
-    if (newThumbnail != null && this.images.contains(newThumbnail)) {
-      newThumbnail.setAsThumbnail(true);
     }
   }
 

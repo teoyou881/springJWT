@@ -11,7 +11,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ProductCreateRequest { // 이름은 주로 ~Request 또는 ~Command
+public class RequestProductCreate { // 이름은 주로 ~Request 또는 ~Command
   @NotBlank(message = "상품명은 필수입니다.")
   private String name;
 
@@ -23,6 +23,9 @@ public class ProductCreateRequest { // 이름은 주로 ~Request 또는 ~Command
 
   @NotNull(message = "카테고리 ID는 필수입니다.")
   private Long categoryId;
+
+  @NotNull(message = "색상은 필수입니다.")
+  private List<String> Colors;
 
   // 상품에 연결될 옵션 그룹 및 그 하위 옵션 값들
   private List<ProductOptionGroupRequest> optionGroups; // Nullable (옵션이 없는 상품도 있을 수 있으므로)
