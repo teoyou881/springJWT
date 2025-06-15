@@ -8,12 +8,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import teo.springjwt.common.utils.CloudinaryStorageService;
 import teo.springjwt.product.dto.ResponseImageDto;
 import teo.springjwt.product.entity.ImageUrlEntity;
 import teo.springjwt.product.entity.ProductColorVariantEntity;
 import teo.springjwt.product.repository.image.ImageUrlRepository;
 import teo.springjwt.product.repository.product.ProductColorVariantEntityRepository;
-import teo.springjwt.util.CloudinaryStorageService;
 
 @Service
 @Transactional

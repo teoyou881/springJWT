@@ -1,4 +1,4 @@
-package teo.springjwt.util;
+package teo.springjwt.common.utils;
 
 import java.io.IOException;
 import org.springframework.web.multipart.MultipartFile;

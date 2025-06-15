@@ -1,4 +1,4 @@
-package teo.springjwt.util;
+package teo.springjwt.common.utils;
 
 import com.cloudinary.Cloudinary;
 import java.io.IOException;
