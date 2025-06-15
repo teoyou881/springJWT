@@ -4,9 +4,11 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,6 +17,7 @@ import teo.springjwt.user.dto.CustomUserDetails;
 import teo.springjwt.user.entity.UserEntity;
 import teo.springjwt.user.enumerated.UserRole;
 
+@Slf4j
 public class JWTFilter extends OncePerRequestFilter {
 
   private final JWTUtil jwtUtil;
@@ -29,7 +32,9 @@ public class JWTFilter extends OncePerRequestFilter {
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
       throws ServletException, IOException, IOException {
 
-    //request에서 Authorization 헤더를 찾음
+
+    // set jwt httpOnly
+    /*//request에서 Authorization 헤더를 찾음
     String authorization= request.getHeader("Authorization");
 
     System.out.println("authorization = " + authorization);
@@ -47,6 +52,28 @@ public class JWTFilter extends OncePerRequestFilter {
     System.out.println("authorization now");
     //Bearer 부분 제거 후 순수 토큰만 획득
     String token = authorization.split(" ")[1];
+
+
+*/
+
+    // 1. 쿠키에서 JWT(Access Token) 가져오기
+    String token = null;
+    Cookie[] cookies = request.getCookies();
+    if (cookies != null) {
+      for (Cookie cookie : cookies) {
+        if (cookie.getName().equals("Authorization")) { // LoginFilter에서 설정한 쿠키 이름
+          token = cookie.getValue();
+          break;
+        }
+      }
+    }
+
+    // 2. JWT가 없으면 다음 필터로 진행
+    if (token == null) {
+      log.debug("No JWT cookie found for request: {}", request.getRequestURI());
+      filterChain.doFilter(request, response);
+      return;
+    }
 
     // --- JWT 자체 유효성 검증 로직 추가 (핵심 개선 부분) ---
     try {
